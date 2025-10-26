@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aditya Institutions – College Finder</title>
+<style>
+body, html {
+  margin:0;
+  padding:0;
+  height:100%;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #ffffff 0%, #ff8c00 100%);
+}
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.logo {
+  width: 60px;
+  height: auto;
+  float: left;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+}
+.header {
+  overflow: auto;
+  margin-bottom: 30px;
+}
+.header h1 {
+  margin:0;
+  padding:0;
+  font-size:24px;
+  font-weight:bold;
+  line-height:60px;
+}
+label {
+  display:block;
+  margin-bottom:5px;
+  font-weight:500;
+}
+select, button {
+  width:100%;
+  padding:8px;
+  margin-bottom:20px;
+  font-size:16px;
+}
+button {
+  background:#ff8c00;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  border-radius:4px;
+}
+button:hover {
+  background:#e07b00;
+}
+
+.result-container {
+  max-width: 800px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.college-header {
+  margin-bottom: 20px;
+}
+h2 {
+  margin: 0;
+  color: #ff8c00;
+}
+.details {
+  line-height: 1.6;
+  font-size: 16px;
+}
+.highlight {
+  font-weight: bold;
+  color: #e07b00;
+}
+a {
+  color: #007BFF;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 10px 15px;
+  background: #ff8c00;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+}
+.back-btn img {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+.back-btn:hover {
+  background:#e07b00;
+}
+
+#collegeImage {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 25px auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.result-header img {
+  width: 60px;
+  height: auto;
+  margin-right: 15px;
+}
+.result-header h1 {
+  font-size: 24px;
+  color: #ff8c00;
+}
+</style>
+</head>
+<body>
+
+<!-- FORM PAGE -->
+<div id="formPage" class="container">
+  <div class="header">
+    <img class="logo" id="mainLogo" src="https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Aditya_Degree_College_Gajuwaka_Logo.png" alt="Aditya">
+    <h1>Aditya Institutions</h1>
+  </div>
+
+  <form id="instForm">
+    <label for="location">Select Location</label>
+    <select id="location" name="location" required>
+      <option value="">-- Please choose --</option>
+      <option value="Kakinada">Kakinada (Andhra Pradesh)</option>
+      <option value="Surampalem">Surampalem (Andhra Pradesh)</option>
+      <option value="Bhimavaram">Bhimavaram (Andhra Pradesh)</option>
+      <option value="Bengaluru">Bengaluru (Karnataka)</option>
+      <option value="Palakolu">Palakolu (Andhra Pradesh)</option>
+      <option value="Vijayawada">Vijayawada (Andhra Pradesh)</option>
+    </select>
+
+    <label for="academics">Select Academics</label>
+    <select id="academics" name="academics" required>
+      <option value="">-- Please choose --</option>
+      <option value="Schooling">Schooling</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Degree">Degree</option>
+      <option value="Engineering">Engineering</option>
+      <option value="PG">PG</option>
+    </select>
+
+    <label for="course">Select Course</label>
+    <select id="course" name="course" required>
+      <option value="">-- Please choose --</option>
+    </select>
+
+    <button type="submit">Submit</button>
+  </form>
+</div>
+
+<!-- RESULT PAGE -->
+<div id="resultPage" class="result-container" style="display:none;">
+  <div class="result-header">
+    <!-- ✅ Added Aditya logo at top-left -->
+    <img src="https://image-upload.getmycollege.com/new-uploads/college/logo/aditya-college-of-engineering-and-technology-logo-715.jpg" alt="Aditya Logo",width="100px">
+    <h1>Aditya Institutions</h1>
+  </div>
+
+  <div id="collegeList"></div>
+
+  <a href="#" id="backButton" class="back-btn">
+    <img src="https://cdn-icons-png.flaticon.com/512/93/93634.png" alt="Back">
+    Back to Form
+  </a>
+</div>
+
+<script>
+const courses = {
+  Schooling: ["1st to 5th","6th to 10th"],
+  Intermediate: ["MPC", "BiPC", "CEC","HEC"],
+  Degree: ["BSc", "BBA", "BCom","BCA,AIR"],
+  Engineering: ["CSE", "EEE", "Civil"],
+  PG: ["MSc", "MBA", "MCom"]
+};
+
+const academicsSelect = document.getElementById('academics');
+const courseSelect = document.getElementById('course');
+const formPage = document.getElementById('formPage');
+const resultPage = document.getElementById('resultPage');
+const collegeList = document.getElementById('collegeList');
+const mainLogo = document.getElementById('mainLogo');
+
+// Logo URLs
+const defaultLogo = "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Aditya_Degree_College_Gajuwaka_Logo.png";
+const changedLogo = "https://www.aditya.ac.in/images/aditya-logo.png";
+
+academicsSelect.addEventListener('change', function() {
+  const selectedAcad = this.value;
+  courseSelect.innerHTML = '<option value="">-- Please choose --</option>';
+  if(selectedAcad && courses[selectedAcad]) {
+    courses[selectedAcad].forEach(course => {
+      const option = document.createElement('option');
+      option.value = course;
+      option.textContent = course;
+      courseSelect.appendChild(option);
+    });
+  }
+});
+
+const collegeData = {
+  "Kakinada": [
+    {
+      name: "Aditya Degree College, Kakinada",
+      address: "Aditya Nagar, Surampalem, Kakinada, Andhra Pradesh",
+      phone: "+91 884-2341234",
+      website: "https://www.aditya.ac.in/degree",
+      image: "https://campuspro.co.in/collage-image/1754915048_row_24.jpg"
+    }
+  ],
+  "Surampalem": [
+    {
+      name: "Aditya Engineering College, Surampalem",
+      address: "Aditya Nagar, ADB Road, Surampalem, East Godavari, Andhra Pradesh",
+      phone: "+91 8855-238550",
+      website: "https://aec.edu.in/",
+      image: "https://campuspro.co.in/collage-image/1751978652_row_3.jpg"
+    }
+  ],
+  "Bhimavaram": [
+    {
+      name: "Aditya Degree College, Bhimavaram",
+      address: "Bhimavaram, West Godavari District, Andhra Pradesh",
+      phone: "+91 8816-223344",
+      website: "https://www.aditya.ac.in/degree",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ5njCg0vA3j7lHsWgQXwOo270N286dKNrhg&s"
+    },
+    {
+      name: "Sri Aditya Degree College, Bhimavaram",
+      address: "Near bus stop, JP Road, Bhimavaram, West Godavari District, Andhra Pradesh",
+      phone: "+91 8816-223345",
+      website: "https://www.aditya.ac.in/degree",
+      image: "https://sadcbvm.in/assets/img/header-mb.jpg"
+    }
+  ],
+  "Bengaluru": [
+    {
+      name: "Aditya College, Bengaluru",
+      address: "MG Road, Bengaluru, Karnataka",
+      phone: "+91 7997046661",
+      website: "https://www.aditya.ac.in/",
+      image: "https://images.shiksha.com/mediadata/images/1595249325phpueIazP.png"
+    }
+  ],
+  "Palakolu": [
+    {
+      name: "Aditya Junior College, Palakolu",
+      address: "Main Road, Palakolu, Andhra Pradesh",
+      phone: "+91 9177176660",
+      website: "https://www.aditya.ac.in/jrcollege/",
+      image: "https://content3.jdmagicbox.com/comp/west-godavari/g5/9999p8814.8814.110211161505.g4g5/catalogue/aditya-junior-college-palakollu-west-godavari-colleges-fe8p85sg1j.jpg"
+    }
+  ],
+  "Vijayawada": [
+    {
+      name: "Aditya Degree College, Vijayawada",
+      address: "Benz Circle, Vijayawada-520010",
+      phone: "+91 913371667",
+      website: "https://www.aditya.ac.in/degree",
+      image: "https://images.shiksha.com/mediadata/images/1491541432php2LKJwV.jpeg"
+    }
+  ]
+};
+
+document.getElementById('instForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const location = document.getElementById('location').value;
+  const academics = document.getElementById('academics').value;
+  const course = document.getElementById('course').value;
+
+  collegeList.innerHTML = '';
+
+  if (location && collegeData[location]) {
+    collegeData[location].forEach(data => {
+      const collegeDiv = document.createElement('div');
+      collegeDiv.classList.add('result-container');
+
+      collegeDiv.innerHTML = `
+        <div class="college-header">
+          <h2>${data.name}</h2>
+          <p>Aditya Group of Institutions</p>
+        </div>
+        <div class="details">
+          <p><span class="highlight">Location:</span> ${location}</p>
+          <p><span class="highlight">Address:</span> ${data.address}</p>
+          <p><span class="highlight">Phone:</span> ${data.phone}</p>
+          <p><span class="highlight">Website:</span> <a href="${data.website}" target="_blank">${data.website}</a></p>
+          <p><span class="highlight">Academics:</span> ${academics}</p>
+          <p><span class="highlight">Course:</span> ${course}</p>
+        </div>
+        <img id="collegeImage" src="${data.image}" alt="College Image">
+      `;
+      collegeList.appendChild(collegeDiv);
+    });
+  }
+
+  mainLogo.src = changedLogo;
+  formPage.style.display = 'none';
+  resultPage.style.display = 'block';
+});
+
+document.getElementById('backButton').addEventListener('click', function(e) {
+  e.preventDefault();
+  mainLogo.src = defaultLogo;
+  resultPage.style.display = 'none';
+  formPage.style.display = 'block';
+});
+</script>
+
+</body>
+</html>
